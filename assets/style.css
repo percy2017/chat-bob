@@ -1,0 +1,431 @@
+/* ===================================================================== */
+/* == 1. FUNDACIONES: Variables Globales y Reseteo             == */
+/* ===================================================================== */
+
+:root {
+	--chat-bob-accent-color: #2563eb;
+	--chat-bob-text-light: #ffffff;
+	--chat-bob-text-dark: #1f2937;
+	--chat-bob-text-gray: #6b7280;
+	--chat-bob-bg-light: #ffffff;
+	--chat-bob-bg-medium: #f1f5f9;
+	--chat-bob-border-color: #e5e7eb;
+	--chat-bob-error-color: #fee2e2;
+	--chat-bob-error-text: #b91c1c;
+	--chat-bob-border-radius: 12px;
+	--chat-bob-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+#chat-bob-window *,
+#chat-bob-window *::before,
+#chat-bob-window *::after {
+	box-sizing: border-box;
+}
+
+/* ===================================================================== */
+/* == 2. ICONOS Y LAYOUT PRINCIPAL                                    == */
+/* ===================================================================== */
+
+.chat-bob-toggle-button::before,
+#chat-bob-window [class^="icon-"]::before,
+#chat-bob-window [class*=" icon-"]::before {
+	font-family: var(--chat-bob-font-family);
+	font-style: normal;
+	font-weight: normal;
+	display: inline-block;
+	text-align: center;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+}
+
+.icon-chat-bubble::before {
+	content: '\1F4AC';
+	font-size: 32px;
+}
+
+.icon-close::before {
+	content: '\00D7';
+	font-size: 28px;
+	font-weight: bold;
+}
+
+.icon-send::before {
+	content: '\27A4';
+	font-size: 20px;
+	transform: rotate(-15deg) translateY(1px);
+}
+
+.icon-attach::before {
+	content: '\1F4CE';
+	font-size: 22px;
+	transform: rotate(45deg);
+}
+
+#chat-bob-window,
+.chat-bob-toggle-button {
+	transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#chat-bob-window.is-closed,
+.chat-bob-toggle-button.is-closed {
+	opacity: 0;
+	transform: scale(0.8) translateY(10px);
+	pointer-events: none;
+}
+
+/* ===================================================================== */
+/* == 3. ESTILOS DE LOS ELEMENTOS RA�Z                                == */
+/* ===================================================================== */
+
+#chat-bob-window {
+	width: 90vw;
+	max-width: 400px;
+	height: 75vh;
+	max-height: 700px;
+	background-color: var(--chat-bob-bg-light);
+	border-radius: var(--chat-bob-border-radius);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	font-family: var(--chat-bob-font-family);
+	line-height: 1.5;
+	font-size: 16px;
+}
+
+.chat-bob-toggle-button {
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	border: none;
+	background-color: var(--chat-bob-accent-color);
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
+	color: var(--chat-bob-text-light);
+}
+
+.chat-bob-toggle-button:hover {
+	transform: scale(1.1);
+}
+
+/* ===================================================================== */
+/* == 4. COMPONENTES INTERNOS DE LA VENTANA                           == */
+/* ===================================================================== */
+
+#chat-bob-window .chat-bob-main-content {
+	flex-grow: 1;
+	overflow-y: auto;
+	position: relative;
+	display: flex;
+}
+
+#chat-bob-window .chat-bob-header {
+	display: flex;
+	align-items: center;
+	padding: 12px 16px;
+	gap: 12px;
+	background-color: var(--chat-bob-accent-color);
+	color: var(--chat-bob-text-light);
+	flex-shrink: 0;
+}
+
+#chat-bob-window .chat-bob-header-title {
+	margin: 0;
+	font-size: 18px;
+	font-weight: 600;
+	flex-grow: 1;
+	color: var(--chat-bob-text-light);
+}
+
+#chat-bob-window .chat-bob-header-button {
+	background: none;
+	border: none;
+	padding: 4px;
+	cursor: pointer;
+	color: var(--chat-bob-text-light);
+	opacity: 0.8;
+}
+
+#chat-bob-window .chat-bob-footer {
+	padding: 8px 12px 12px;
+	border-top: 1px solid var(--chat-bob-border-color);
+	background-color: var(--chat-bob-bg-light);
+	flex-shrink: 0;
+}
+
+#chat-bob-window .chat-bob-footer-controls {
+	display: flex;
+	align-items: flex-end;
+	gap: 8px;
+}
+
+#chat-bob-window .chat-bob-icon-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 40px;
+	height: 40px;
+	background: none;
+	border: none;
+	border-radius: 50%;
+	cursor: pointer;
+	padding: 0;
+	color: var(--chat-bob-text-gray);
+}
+
+#chat-bob-window #chat-bob-input {
+	flex-grow: 1;
+	border: 1px solid var(--chat-bob-border-color);
+	border-radius: 20px;
+	padding: 10px 16px;
+	font-size: 15px;
+	resize: none;
+	overflow-y: hidden;
+	line-height: 1.4;
+	max-height: 100px;
+}
+
+#chat-bob-window #chat-bob-send-button {
+	color: var(--chat-bob-text-light);
+	background-color: var(--chat-bob-accent-color);
+}
+
+#chat-bob-window #chat-bob-send-button:disabled {
+	background-color: #ccc;
+	cursor: not-allowed;
+}
+
+#chat-bob-window .chat-bob-chat-wrapper,
+#chat-bob-window .chat-bob-login-wrapper {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+/* ===================================================================== */
+/* == 5. ESTILOS DE LA CONVERSACION Y MENSAJES                        == */
+/* ===================================================================== */
+
+#chat-bob-window #chat-bob-messages {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding: 16px;
+	flex-grow: 1;
+	overflow-y: auto;
+}
+
+#chat-bob-window .chat-bob-message {
+	padding: 10px 14px;
+	border-radius: var(--chat-bob-border-radius);
+	max-width: 80%;
+	word-wrap: break-word;
+	line-height: 1.4;
+}
+
+#chat-bob-window .message-bot {
+	background-color: var(--chat-bob-bg-medium);
+	color: var(--chat-bob-text-dark);
+	align-self: flex-start;
+	border-bottom-left-radius: 4px;
+}
+
+#chat-bob-window .message-user {
+	background-color: var(--chat-bob-accent-color);
+	color: var(--chat-bob-text-light);
+	align-self: flex-end;
+	border-bottom-right-radius: 4px;
+}
+
+#chat-bob-window .message-error {
+	background-color: var(--chat-bob-error-color);
+	color: var(--chat-bob-error-text);
+	align-self: flex-start;
+	font-size: 14px;
+}
+
+/* --- NUEVOS ESTILOS PARA IMAGENES EN EL CHAT --- */
+#chat-bob-window .message-with-image {
+	padding: 4px;
+}
+
+#chat-bob-window .chat-bob-chat-image {
+	max-width: 100%;
+	border-radius: calc(var(--chat-bob-border-radius) - 6px);
+	display: block;
+}
+
+#chat-bob-window .image-caption {
+	padding: 6px 10px 4px;
+	margin: 0;
+	line-height: 1.4;
+}
+
+/* Indicador de "Escribiendo..." */
+#chat-bob-window .message-typing {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+
+#chat-bob-window .message-typing span {
+	width: 8px;
+	height: 8px;
+	background-color: #9ca3af;
+	border-radius: 50%;
+	animation: typing-bounce 1.2s infinite ease-in-out;
+}
+
+#chat-bob-window .message-typing span:nth-of-type(2) {
+	animation-delay: -1.0s;
+}
+
+#chat-bob-window .message-typing span:nth-of-type(3) {
+	animation-delay: -0.8s;
+}
+
+@keyframes typing-bounce {
+
+	0%,
+	80%,
+	100% {
+		transform: scale(0);
+	}
+
+	40% {
+		transform: scale(1.0);
+	}
+}
+
+/* ===================================================================== */
+/* == 6. ESTILOS DE LOGIN, ADJUNTOS Y LIBRERIAS EXTERNAS             == */
+/* ===================================================================== */
+
+#chat-bob-window .chat-bob-login-wrapper {
+	justify-content: center;
+	align-items: center;
+	padding: 24px;
+	text-align: center;
+}
+
+#chat-bob-window #chat-bob-identify-form {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	width: 100%;
+	margin-top: 20px;
+}
+
+#chat-bob-window .chat-bob-form-field label {
+	display: block;
+	font-weight: 500;
+	margin-bottom: 4px;
+	font-size: 14px;
+	text-align: left;
+}
+
+#chat-bob-window .chat-bob-form-field input {
+	width: 100%;
+	padding: 10px;
+	border: 1px solid var(--chat-bob-border-color);
+	border-radius: 8px;
+}
+
+#chat-bob-window .chat-bob-submit-button {
+	padding: 12px;
+	border: none;
+	border-radius: 8px;
+	background-color: var(--chat-bob-accent-color);
+	color: var(--chat-bob-text-light);
+	font-weight: bold;
+	cursor: pointer;
+}
+
+#chat-bob-window .chat-bob-form-error {
+	color: var(--chat-bob-error-text);
+	font-size: 14px;
+}
+
+#chat-bob-window .chat-bob-login-logo {
+	margin-bottom: 12px;
+}
+
+#chat-bob-window .chat-bob-login-logo img {
+	width: 64px;
+	height: 64px;
+	border-radius: 50%;
+	object-fit: cover;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#chat-bob-window .chat-bob-form-row {
+	display: flex;
+	gap: 12px;
+}
+
+#chat-bob-window .chat-bob-form-row .chat-bob-form-field {
+	flex: 1;
+}
+
+#chat-bob-window .chat-bob-attachment-preview {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background-color: var(--chat-bob-bg-medium);
+	padding: 6px 10px;
+	border-radius: 8px;
+	font-size: 13px;
+	color: var(--chat-bob-text-gray);
+	margin-bottom: 8px;
+}
+
+#chat-bob-window .chat-bob-attachment-preview span {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 80%;
+}
+
+#chat-bob-window .chat-bob-attachment-preview button {
+	background: none;
+	border: none;
+	font-weight: bold;
+	cursor: pointer;
+	padding: 0 4px;
+	font-size: 16px;
+	color: var(--chat-bob-text-gray);
+}
+
+/* Integracion de intl-tel-input */
+#chat-bob-window .iti {
+	width: 100%;
+}
+
+.iti__country-list {
+	z-index: 2147483647 !important;
+}
+
+#chat-bob-window #cb_phone.iti__tel-input {
+	padding-left: 56px !important;
+}
+
+/* ===================================================================== */
+/* == 7. DISE�O RESPONSIVO (Moviles)                                  == */
+/* ===================================================================== */
+
+@media (max-width: 480px) {
+	#chat-bob-window {
+		width: 100%;
+		height: 100vh;
+		max-height: 100vh;
+		border-radius: 0;
+		right: 0 !important;
+		bottom: 0 !important;
+		left: 0 !important;
+	}
+}

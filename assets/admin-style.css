@@ -1,0 +1,125 @@
+/**
+ * Estilos para las páginas de administración de Chat Bob.
+ * Principalmente para el modal del historial de chats y la tabla.
+ */
+
+/* === Estilos del Modal === */
+
+.chat-bob-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 100000;
+    display: none;
+    /* Se activa con JS */
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-bob-modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
+}
+
+.chat-bob-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.chat-bob-modal-header h2 {
+    margin: 0;
+    font-size: 1.2em;
+    padding-right: 15px;
+}
+
+.chat-bob-modal-close {
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .5;
+    cursor: pointer;
+    background: 0 0;
+    border: 0;
+}
+
+.chat-bob-modal-close:hover {
+    opacity: .8;
+}
+
+.chat-bob-modal-body {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding-right: 10px;
+    /* Espacio para la barra de scroll */
+}
+
+.chat-bob-modal-body .loading-text {
+    text-align: center;
+    font-style: italic;
+    color: #777;
+    padding: 20px;
+}
+
+
+/* === Estilos de Mensajes dentro del Modal === */
+
+.chat-bob-modal-body .message {
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    max-width: 85%;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.chat-bob-modal-body .user-message {
+    background-color: #dcf8c6;
+    /* Verde claro tipo WhatsApp */
+    align-self: flex-end;
+    margin-left: auto;
+}
+
+.chat-bob-modal-body .assistant-message {
+    background-color: #f1f1f1;
+    /* Gris claro */
+    align-self: flex-start;
+}
+
+.chat-bob-modal-body .message-meta {
+    font-size: 0.8em;
+    color: #666;
+    display: block;
+    margin-top: 4px;
+}
+
+
+/* === Ajustes para la tabla DataTables === */
+#chat-history-table .column-actions .button {
+    margin: 0 5px 5px 0;
+}
+
+#chat-history-table td {
+    vertical-align: middle;
+}
+
+#chat-history-table .user-avatar img {
+    border-radius: 50%;
+    border: 1px solid #ddd;
+}
