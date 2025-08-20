@@ -1,10 +1,4 @@
 <?php
-/**
- * Este archivo contiene los manejadores AJAX exclusivos para el área de administración de Chat Bob.
- *
- * @package ChatBob
- */
-
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -73,7 +67,6 @@ function chat_bob_get_history_data()
                 $user_display[] = '<em>' . __('Usuario Eliminado', 'chat-bob') . ' (ID: ' . esc_html($author_id) . ')</em>';
             }
 
-            // *** MODIFICADO ***: El botón Eliminar ya no es un enlace de navegación.
             $actions = '<a href="#" class="button button-secondary view-conversation-btn" data-session-id="' . esc_attr($session_id) . '">' . __('Ver Chat', 'chat-bob') . '</a>';
             if ($user_info && function_exists('wc_get_orders'))
                 $actions .= ' <a href="#" class="button button-secondary view-orders-btn" data-user-id="' . esc_attr($author_id) . '" data-user-name="' . esc_attr($user_info->display_name) . '">' . __('Ver Pedidos', 'chat-bob') . '</a>';
@@ -101,10 +94,6 @@ function chat_bob_get_history_data()
     ]);
 }
 
-
-/**
- * Manejador AJAX para obtener los detalles de una conversación.
- */
 function chat_bob_get_conversation_details()
 {
     check_ajax_referer('chat_bob_view_nonce', '_wpnonce');
@@ -130,9 +119,6 @@ function chat_bob_get_conversation_details()
     wp_send_json_success(['html' => $html]);
 }
 
-/**
- * Manejador AJAX para obtener los pedidos de un cliente.
- */
 function chat_bob_get_user_orders()
 {
     check_ajax_referer('chat_bob_orders_nonce', '_wpnonce');
@@ -171,9 +157,6 @@ function chat_bob_get_user_orders()
     wp_send_json_success(['html' => $html]);
 }
 
-/**
- * Manejador AJAX unificado para eliminar una o varias conversaciones.
- */
 function chat_bob_handle_delete_chats()
 {
     check_ajax_referer('chat_bob_delete_nonce', '_wpnonce');
@@ -183,8 +166,7 @@ function chat_bob_handle_delete_chats()
     $sanitized_ids = [];
     if (isset($_POST['session_ids']) && is_array($_POST['session_ids'])) {
         $sanitized_ids = array_map('intval', $_POST['session_ids']);
-    }
-    elseif (isset($_POST['session_id'])) {
+    } elseif (isset($_POST['session_id'])) {
         $sanitized_ids[] = intval($_POST['session_id']);
     }
 
@@ -205,10 +187,10 @@ function chat_bob_handle_delete_chats()
     }
 }
 
-
 // =====================================================================
 // == MANEJADORES PARA LA PÁGINA DE CONFIGURACIÓN Y HERRAMIENTAS
 // =====================================================================
+
 function chat_bob_get_models()
 {
     check_ajax_referer('chat_bob_get_models_nonce', '_wpnonce');
@@ -243,9 +225,6 @@ function chat_bob_get_models()
     }
 }
 
-/**
- * Exporta la configuración actual como un archivo JSON.
- */
 function chat_bob_export_settings()
 {
     check_ajax_referer('chat_bob_export_nonce', '_wpnonce');
@@ -263,9 +242,6 @@ function chat_bob_export_settings()
     exit;
 }
 
-/**
- * Importa la configuración desde un archivo JSON.
- */
 function chat_bob_import_settings()
 {
     check_ajax_referer('chat_bob_import_nonce', '_wpnonce');
@@ -291,16 +267,12 @@ function chat_bob_import_settings()
         wp_send_json_error(['message' => __('El archivo JSON es inválido.', 'chat-bob')]);
     }
 
-    // Usar la misma función de sanitización para asegurar la integridad de los datos importados.
     $sanitized_data = chat_bob_sanitize_settings($data);
     update_option('chat_bob_settings', $sanitized_data);
 
     wp_send_json_success(['message' => __('Configuración importada correctamente.', 'chat-bob')]);
 }
 
-/**
- * Restablece todas las opciones del plugin a sus valores por defecto.
- */
 function chat_bob_reset_settings()
 {
     check_ajax_referer('chat_bob_reset_nonce', '_wpnonce');
@@ -312,9 +284,6 @@ function chat_bob_reset_settings()
     wp_send_json_success(['message' => __('Configuración restablecida correctamente.', 'chat-bob')]);
 }
 
-/**
- * Guarda la preferencia del usuario para no volver a mostrar la guía de onboarding.
- */
 function chat_bob_dismiss_onboarding()
 {
     check_ajax_referer('chat_bob_dismiss_nonce', '_wpnonce');

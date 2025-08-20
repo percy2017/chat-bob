@@ -3,7 +3,7 @@
  * Plugin Name:       Chat Bob
  * Description:       Un agente de IA proactivo con herramientas, soporte para archivos y una arquitectura resiliente.
  * Version:           1.0
- * Author:            Ing. Percy Alvarez
+ * Author:            Ing. Percy AlvarezC
  * Author URI:        https://percyalvarez.com/chat-bob
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -16,27 +16,22 @@ if (!defined('ABSPATH')) {
 }
 
 final class Chat_Bob_Orchestrator
-{
-
+{	
 	private $version = '1.0';
-
 	public function __construct()
 	{
 		$this->load_dependencies();
 		$this->register_hooks();
 	}
-
 	private function load_dependencies()
 	{
 		$plugin_path = plugin_dir_path(__FILE__);
-		// Es crucial cargar los archivos que contienen funciones usadas globalmente.
 		require_once $plugin_path . 'includes/admin-page-settings.php';
 		require_once $plugin_path . 'includes/post-types.php';
 		require_once $plugin_path . 'includes/admin-page-history.php';
 		require_once $plugin_path . 'includes/ajax-handlers.php';
 		require_once $plugin_path . 'includes/admin-ajax-handlers.php';
 	}
-
 	private function register_hooks()
 	{
 		add_action('init', 'chat_bob_register_cpt');
@@ -47,7 +42,6 @@ final class Chat_Bob_Orchestrator
 		$this->register_ajax_hooks();
 		$this->register_admin_ajax_hooks();
 	}
-
 	public function create_admin_menu()
 	{
 		add_menu_page('Chat Bob', 'Chat Bob', 'manage_options', 'chat-bob-settings', 'chat_bob_render_settings_page', 'dashicons-format-chat', 25);
@@ -55,13 +49,9 @@ final class Chat_Bob_Orchestrator
 		add_submenu_page('chat-bob-settings', 'Historial de Chats', 'Historial', 'manage_options', 'chat-bob-history', 'chat_bob_render_history_page');
 	}
 
-	/**
-	 * Carga los assets del frontend.
-	 */
 	public function enqueue_frontend_assets()
 	{
 		$options = get_option('chat_bob_settings', []);
-		// La función chat_bob_get_default_options está en admin-page-settings.php
 		$defaults = function_exists('chat_bob_get_default_options') ? chat_bob_get_default_options() : [];
 		$config = wp_parse_args($options, $defaults);
 
@@ -73,18 +63,14 @@ final class Chat_Bob_Orchestrator
 
 		wp_enqueue_style('intl-tel-input-css', 'https://cdn.jsdelivr.net/npm/intl-tel-input@19.2.16/build/css/intlTelInput.css', [], '19.2.16');
 		wp_enqueue_script('intl-tel-input-js', 'https://cdn.jsdelivr.net/npm/intl-tel-input@19.2.16/build/js/intlTelInput.min.js', [], '19.2.16', true);
-
-		// --- Carga de assets del plugin ---
 		wp_enqueue_style('chat-bob-style', plugin_dir_url(__FILE__) . 'assets/style.css', ['intl-tel-input-css'], $this->version);
+		wp_enqueue_script('marked-js', 'https://cdn.jsdelivr.net/npm/marked/marked.min.js', [], '5.0.1', true);
+		
 		$custom_css = ":root { --chat-bob-accent-color: " . esc_attr($config['primary_color']) . "; }";
 		wp_add_inline_style('chat-bob-style', $custom_css);
-
-		// --- MODIFICADO: Se añade 'intl-tel-input-js' como dependencia del script principal ---
 		wp_enqueue_script('chat-bob-script', plugin_dir_url(__FILE__) . 'assets/script.js', ['jquery', 'intl-tel-input-js'], $this->version, true);
-
 		wp_localize_script('chat-bob-script', 'chat_bob_data', $localized_data);
 	}
-
 	public function render_chat_ui_templates()
 	{
 		$options = get_option('chat_bob_settings', []);
@@ -95,7 +81,6 @@ final class Chat_Bob_Orchestrator
 		include plugin_dir_path(__FILE__) . 'templates/chat-ui-page.php';
 		include plugin_dir_path(__FILE__) . 'templates/chat-ui-button.php';
 	}
-
 	public function enqueue_admin_assets($hook_suffix)
 	{
 		$settings_page_hook = 'toplevel_page_chat-bob-settings';
@@ -130,7 +115,6 @@ final class Chat_Bob_Orchestrator
 			]);
 		}
 	}
-
 	private function register_ajax_hooks()
 	{
 		$ajax_actions = ['send_message', 'load_history', 'identify_user'];
@@ -141,7 +125,6 @@ final class Chat_Bob_Orchestrator
 			}
 		}
 	}
-
 	private function register_admin_ajax_hooks()
 	{
 		$admin_actions = ['get_history_data', 'get_conversation_details', 'get_user_orders', 'handle_delete_chats', 'get_models', 'export_settings', 'import_settings', 'reset_settings', 'dismiss_onboarding'];

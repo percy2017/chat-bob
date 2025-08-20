@@ -1,21 +1,8 @@
 <?php
-/**
- * Motor de Ejecución de Herramientas de Chat Bob
- * @package ChatBob
- */
-
 if (!defined('ABSPATH')) {
-	exit; // Salida de seguridad.
+	exit;
 }
 
-/**
- * Función "Router" principal. Recibe una llamada de herramienta y la dirige
- * a la función de ejecución correspondiente.
- *
- * @param string $tool_name El nombre de la herramienta a ejecutar.
- * @param array  $args      Los argumentos para la herramienta.
- * @return mixed El resultado de la ejecución de la herramienta.
- */
 function chat_bob_execute_tool($tool_name, $args)
 {
 	switch ($tool_name) {
@@ -32,14 +19,6 @@ function chat_bob_execute_tool($tool_name, $args)
 	}
 }
 
-
-/**
- * EJECUCIÓN: Busca productos en WooCommerce.
- * Implementa el enfoque híbrido: usa funciones nativas y devuelve un JSON limpio.
- *
- * @param array $args Argumentos de la búsqueda (termino_busqueda, categoria).
- * @return array Lista de productos formateados.
- */
 function chat_bob_execute_buscar_productos($args)
 {
 	if (!function_exists('wc_get_products')) {
@@ -47,7 +26,7 @@ function chat_bob_execute_buscar_productos($args)
 	}
 
 	$query_args = [
-		'limit' => 5, // Limitar para no sobrecargar el contexto.
+		'limit' => isset($args['limit']) ? intval($args['limit']) : 5,
 		'status' => 'publish',
 	];
 
@@ -77,7 +56,9 @@ function chat_bob_execute_buscar_productos($args)
 				$product_data['precio'] = (float) $product->get_price();
 				break;
 			case 'variable':
-				$product_data['rango_precios'] = $product->get_price_html();
+				$product_data['precio_minimo'] = (float) $product->get_variation_price('min');
+				$product_data['precio_maximo'] = (float) $product->get_variation_price('max');
+				
 				$product_data['atributos_disponibles'] = $product->get_variation_attributes();
 
 				$variations_data = [];
@@ -100,13 +81,6 @@ function chat_bob_execute_buscar_productos($args)
 
 	return $formatted_products;
 }
-
-/**
- * EJECUCIÓN: Obtiene el historial de pedidos de un cliente.
- *
- * @param array $args Argumentos (id_pedido, estado).
- * @return array Lista de pedidos formateados.
- */
 function chat_bob_execute_obtener_historial_pedidos($args)
 {
 	$user_id = get_current_user_id();
@@ -116,7 +90,7 @@ function chat_bob_execute_obtener_historial_pedidos($args)
 
 	$query_args = [
 		'customer_id' => $user_id,
-		'limit' => 5,
+		'limit' => isset($args['limit']) ? intval($args['limit']) : 5,
 		'orderby' => 'date',
 		'order' => 'DESC',
 	];
@@ -139,7 +113,6 @@ function chat_bob_execute_obtener_historial_pedidos($args)
 				'cantidad' => $item->get_quantity(),
 				'precio_unitario' => (float) $order->get_item_total($item, false, false),
 			];
-			// Extraer atributos de la variación si existen.
 			$variation_attributes = [];
 			foreach ($item->get_meta_data() as $meta) {
 				if (taxonomy_exists($meta->key)) {
@@ -157,7 +130,7 @@ function chat_bob_execute_obtener_historial_pedidos($args)
 
 		$formatted_orders[] = [
 			'id_pedido' => $order->get_id(),
-			'fecha_creacion' => $order->get_date_created()->format('c'), // Formato ISO 8601
+			'fecha_creacion' => $order->get_date_created()->format('c'),
 			'estado' => $order->get_status(),
 			'total_pedido' => (float) $order->get_total(),
 			'moneda' => $order->get_currency(),
@@ -169,11 +142,6 @@ function chat_bob_execute_obtener_historial_pedidos($args)
 	return $formatted_orders;
 }
 
-/**
- * EJECUCIÓN: Busca todos los cupones activos.
- *
- * @return array Lista de cupones formateados.
- */
 function chat_bob_execute_buscar_cupones()
 {
 	if (!function_exists('wc_get_coupon_id_by_code')) {
@@ -204,13 +172,6 @@ function chat_bob_execute_buscar_cupones()
 
 	return $formatted_coupons;
 }
-
-/**
- * EJECUCIÓN: Añade productos al carrito y devuelve la URL de pago.
- *
- * @param array $args Argumentos (array de productos).
- * @return array Estado de la operación y URL del checkout.
- */
 function chat_bob_execute_crear_pedido($args)
 {
 	if (get_current_user_id() === 0 || !function_exists('WC') || !isset($args['productos'])) {

@@ -227,15 +227,26 @@
     // == 5. FUNCIONES AUXILIARES Y EJECUCIÓN                           ==
     // =====================================================================
     const addMessage = (text, sender, animate = true) => {
-      const sanitizedText = $("<div>").text(text).html().replace(/\n/g, "<br>");
+      let messageContentHtml;
+      if (sender === "bot" && typeof marked !== "undefined") {
+        messageContentHtml = marked.parse(text);
+      } else {
+        messageContentHtml = $("<div>")
+          .text(text)
+          .html()
+          .replace(/\n/g, "<br>");
+      }
+
       const messageDiv = $(
         `<div class="chat-bob-message message-${sender}"></div>`
-      ).html(sanitizedText);
+      ).html(messageContentHtml);
+
       if (animate) messageDiv.hide();
       messagesContainer.append(messageDiv);
       if (animate) messageDiv.fadeIn(300);
       scrollToBottom();
     };
+
     const showTyping = () => {
       if ($(".message-typing").length === 0)
         messagesContainer.append(
@@ -243,6 +254,7 @@
         );
       scrollToBottom();
     };
+
     const hideTyping = () => $(".message-typing").remove();
     const scrollToBottom = () => {
       if (messagesContainer.length)
@@ -250,6 +262,7 @@
           .stop()
           .animate({ scrollTop: messagesContainer[0].scrollHeight }, 300);
     };
+    
     const autoResizeTextarea = () => {
       const ta = messageInput[0];
       ta.style.height = "auto";

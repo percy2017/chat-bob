@@ -1,18 +1,8 @@
 <?php
-/**
- * Manifiesto de Herramientas de Chat Bob
- * @package ChatBob
- */
-
 if (!defined('ABSPATH')) {
 	exit;
 }
 
-/**
- * Devuelve el array completo de esquemas de herramientas disponibles.
- *
- * @return array El array de esquemas de herramientas.
- */
 function chat_bob_get_tool_schemas()
 {
 	return [
@@ -23,19 +13,13 @@ function chat_bob_get_tool_schemas()
 	];
 }
 
-/**
- * Define el esquema para la herramienta 'buscar_productos'.
- *
- * @return array
- */
 function chat_bob_schema_buscar_productos()
 {
 	return [
 		'type' => 'function',
 		'function' => [
 			'name' => 'buscar_productos',
-			// --- MODIFICADO: Descripción mucho más directiva y enfática ---
-			'description' => 'Herramienta principal y obligatoria para responder CUALQUIER pregunta sobre la disponibilidad, precio o detalles de un producto. SIEMPRE debes usar esta herramienta antes de afirmar que un producto no existe en la tienda. No respondas de memoria.',
+			'description' => 'Busca en el catalogo de productos de la tienda por nombre o categoría. Usala cuando un cliente pregunte por productos específicos, disponibilidad o precios.',
 			'parameters' => [
 				'type' => 'object',
 				'properties' => [
@@ -47,6 +31,10 @@ function chat_bob_schema_buscar_productos()
 						'type' => 'string',
 						'description' => 'La categoría específica del producto, si el cliente la menciona. Por ejemplo: "servicios digitales", "suscripciones".',
 					],
+					'limit' => [
+						'type' => 'integer',
+						'description' => 'Número máximo de productos a devolver. El valor por defecto es 5. Usa -1 para devolver TODOS los productos disponibles.'
+					]
 				],
 				'required' => ['termino_busqueda'],
 			],
@@ -54,11 +42,6 @@ function chat_bob_schema_buscar_productos()
 	];
 }
 
-/**
- * Define el esquema para la herramienta 'obtener_historial_pedidos'.
- *
- * @return array
- */
 function chat_bob_schema_obtener_historial_pedidos()
 {
 	return [
@@ -77,17 +60,16 @@ function chat_bob_schema_obtener_historial_pedidos()
 						'type' => 'string',
 						'description' => 'Filtra los pedidos por un estado específico. Valores posibles: "processing", "completed", "on-hold", "cancelled", "refunded", "failed".',
 					],
+					'limit' => [
+						'type' => 'integer',
+						'description' => 'Número máximo de pedidos a devolver. El valor por defecto es 5. Usa -1 para devolver TODOS los pedidos.'
+					]
 				],
 			],
 		],
 	];
 }
 
-/**
- * Define el esquema para la herramienta 'buscar_cupones'.
- *
- * @return array
- */
 function chat_bob_schema_buscar_cupones()
 {
 	return [
@@ -97,18 +79,12 @@ function chat_bob_schema_buscar_cupones()
 			'description' => 'Obtiene una lista de TODOS los cupones de descuento actualmente activos en la tienda. Úsala si el cliente pregunta por ofertas, promociones o descuentos disponibles. No requiere parámetros.',
 			'parameters' => [
 				'type' => 'object',
-				// --- CORRECCIÓN: Usar un objeto vacío en lugar de un array vacío ---
 				'properties' => new stdClass(),
 			],
 		],
 	];
 }
 
-/**
- * Define el esquema para la herramienta 'crear_pedido'.
- *
- * @return array
- */
 function chat_bob_schema_crear_pedido()
 {
 	return [

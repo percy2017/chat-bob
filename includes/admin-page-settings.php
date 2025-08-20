@@ -1,17 +1,11 @@
 <?php
-/**
- * Gestiona el registro y renderizado de la página de configuración.
- * @package ChatBob
- */
-
 if (!defined('ABSPATH')) {
-    exit; // Salida de seguridad si se accede directamente.
+    exit;
 }
 
 // =====================================================================
 // == 1. REGISTRO DE AJUSTES, SECCIONES Y CAMPOS (API de Ajustes de WP)
 // =====================================================================
-
 function chat_bob_register_settings()
 {
     register_setting('chat_bob_options_group', 'chat_bob_settings', 'chat_bob_sanitize_settings');
@@ -46,15 +40,48 @@ function chat_bob_field_callback_text($args)
 {
     $options = get_option('chat_bob_settings', chat_bob_get_default_options());
     $value = $options[$args['id']] ?? '';
-    echo "<input type='{$args['type']}' id='{$args['id']}' name='chat_bob_settings[{$args['id']}]' value='" . esc_attr($value) . "' class='regular-text' placeholder='" . esc_attr($args['placeholder'] ?? '') . "'>";
+    // ==========================================================
+    // == CORRECCIÓN DEL BUG ==
+    // Añadimos 'text' como valor por defecto si 'type' no está definido.
+    $type = $args['type'] ?? 'text';
+    // ==========================================================
+    echo "<input type='{$type}' id='{$args['id']}' name='chat_bob_settings[{$args['id']}]' value='" . esc_attr($value) . "' class='regular-text' placeholder='" . esc_attr($args['placeholder'] ?? '') . "'>";
     if (isset($args['description']))
         echo "<p class='description'>" . esc_html($args['description']) . "</p>";
 }
+
 function chat_bob_field_callback_textarea($args)
 {
     $options = get_option('chat_bob_settings', chat_bob_get_default_options());
     $value = $options[$args['id']] ?? '';
     echo "<textarea id='{$args['id']}' name='chat_bob_settings[{$args['id']}]' rows='{$args['rows']}' class='large-text code' placeholder='{$args['placeholder']}'>" . esc_textarea($value) . "</textarea>";
+
+    // ==========================================================
+    // == GUÍA COMPLETA PARA EL USUARIO AÑADIDA ==
+    // ==========================================================
+    ?>
+    <p class="description" style="margin-top:10px;">
+        <strong><?php _e('Guía Rápida para tu Prompt:', 'chat-bob'); ?></strong><br>
+        <?php _e('Tu asistente tiene las siguientes capacidades. ¡Úsalas en tu prompt para guiarlo!', 'chat-bob'); ?>
+    </p>
+    <ul style="list-style: disc; margin-left: 20px; font-size: 12px; color: #555;">
+        <li><strong><?php _e('Buscar productos:', 'chat-bob'); ?></strong> <?php _e('Puede buscar en todo el catálogo de WooCommerce.', 'chat-bob'); ?></li>
+        <li><strong><?php _e('Consultar historial de pedidos:', 'chat-bob'); ?></strong> <?php _e('Puede ver los pedidos anteriores del cliente conectado.', 'chat-bob'); ?></li>
+        <li><strong><?php _e('Encontrar cupones:', 'chat-bob'); ?></strong> <?php _e('Puede listar todos los descuentos activos.', 'chat-bob'); ?></li>
+        <li><strong><?php _e('Crear un pedido:', 'chat-bob'); ?></strong> <?php _e('Puede añadir productos al carrito y dirigir al cliente al pago.', 'chat-bob'); ?></li>
+    </ul>
+
+    <p class="description" style="margin-top: 10px;">
+        <strong><?php _e('Placeholders disponibles:', 'chat-bob'); ?></strong>
+        <br>
+        <code style="font-size:11px;">[store_name]</code>, 
+        <code style="font-size:11px;">[store_tagline]</code>, 
+        <code style="font-size:11px;">[store_url]</code>, 
+        <code style="font-size:11px;">[contact_url]</code>, 
+        <code style="font-size:11px;">[admin_email]</code>
+    </p>
+    <?php
+    // ==========================================================
 }
 function chat_bob_field_callback_number($args)
 {
@@ -100,7 +127,6 @@ function chat_bob_field_callback_model_select()
 // =====================================================================
 // == 3. FUNCIONES DE SANITIZACIÓN Y RENDERIZADO DE PÁGINA
 // =====================================================================
-
 function chat_bob_sanitize_settings($input)
 {
     $sanitized_input = [];
@@ -129,7 +155,6 @@ function chat_bob_sanitize_capabilities($input)
     $decoded = json_decode(stripslashes($input), true);
     return is_array($decoded) ? wp_json_encode($decoded) : '{}';
 }
-
 function chat_bob_render_settings_page()
 {
     wp_enqueue_style('wp-color-picker');
@@ -150,7 +175,6 @@ function chat_bob_render_settings_page()
 // =====================================================================
 // == 4. JAVASCRIPT PARA LA PÁGINA DE CONFIGURACIÓN
 // =====================================================================
-
 function chat_bob_inject_settings_script()
 {
     $current_settings = get_option('chat_bob_settings', chat_bob_get_default_options());
@@ -236,7 +260,8 @@ function chat_bob_inject_settings_script()
                         <tr><th>Precio Entrada / 1M tokens</th><td>${formatCost(capabilities.input_cost_per_token)}</td></tr>
                         <tr><th>Precio Salida / 1M tokens</th><td>${formatCost(capabilities.output_cost_per_token)}</td></tr>
                         <tr><td colspan="2"><hr style="margin: 5px 0; border-top: 1px solid #ddd;"></td></tr>
-                        <tr><th>Soporta Herramientas (Agente)</th><td>${formatBool(capabilities.supports_function_calling)}</td></tr>
+                        <tr><th>Soporta Herramientas Basicas</th><td>${formatBool(capabilities.supports_function_calling)}</td></tr>
+                        <tr><th>Soporta Herramientas Avanzadas</th><td>${formatBool(capabilities.supports_tool_choice)}</td></tr>
                         <tr><th>Soporta Visión (Imágenes)</th><td>${formatBool(capabilities.supports_vision)}</td></tr>
                         <tr><th>Soporta PDF (Nativo)</th><td>${formatBool(capabilities.supports_pdf_input)}</td></tr>
                         <tr><th>Soporta Audio (Entrada)</th><td>${formatBool(capabilities.supports_audio_input)}</td></tr>
